@@ -57,19 +57,20 @@ const nextPageButtonVisibility = (metadata) => {
 
 const buildTweets = (tweets, nextPage) => {
     let twitterContent = "";
+    let userContent = "";
     tweets.map((tweet)=>{
         twitterContent += `                   
         <div class="tweet-container">
           <div class="tweet-user-info">
-             <div class="tweet-user-profile">
+             <div class="tweet-user-profile" style="background-image: url(${tweet.user.profile_image_url_https})">
                  
              </div>
-             <div class="tweet-user-name-container">
-                 <div class="tweet-user-fullname">
-                     Akeem Ayoade
-                 </div>
+              <div class="tweet-user-name-container">
+               <div class="tweet-user-fullname">
+                     ${tweet.user.name}
+                </div>
                  <div class="tweet-user-username">
-                     @Slicefpv
+                     ${tweet.user.screen_name}
                  </div>
              </div>
         </div>
@@ -90,10 +91,13 @@ const buildTweets = (tweets, nextPage) => {
             20 hours ago
          </div>
         </div>
-        `
+    `
+
     })
 
     document.querySelector('.tweets-list').innerHTML = twitterContent;
+   
+
 }
 
 /**
