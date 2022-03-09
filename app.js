@@ -15,7 +15,7 @@ app.use((req, res, next)=>{
 app.get('/tweets', (req, res) => { 
     const query = req.query.q;
     const count = req.query.count;
-    
+   
     twitter.get(query, count).then((response) => {
         res.status(200).send(response.data);
     }).catch((error) => {
