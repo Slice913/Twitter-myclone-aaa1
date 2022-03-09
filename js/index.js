@@ -57,7 +57,7 @@ const nextPageButtonVisibility = (metadata) => {
 
 const buildTweets = (tweets, nextPage) => {
     let twitterContent = "";
-    let userContent = "";
+    
     tweets.map((tweet)=>{
         twitterContent += `                   
         <div class="tweet-container">
