@@ -150,3 +150,22 @@ body {
   padding-left: 10px;
   cursor: pointer;
 }
+
+.next-page-container {
+  border: 1px solid #1c1c1c;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding: 6px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.next-page-container i {
+  color: #47525d;
+}
+
+.next-page-container:hover {
+  background-color: #1c1c1c;
+}
