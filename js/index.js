@@ -1,5 +1,7 @@
 const URL = "http://localhost:3000/tweets";
 
+let nextPageUrl = null;
+
 
 const onEnter = (e) => {
  if(e.key == "Enter") {
@@ -7,26 +9,33 @@ const onEnter = (e) => {
     }
 }
 
+const onNextPage = () => {
+    if(nextPageUrl) {
+        getTwitterData(true);
+    }
+}
+
 /**
  * Retrive Twitter Data from API
  */
-const getTwitterData = () => {
+const getTwitterData = (nextPage = false) => {
 
     const query = document.getElementById('user-search-input').value;
     
     if(!query) return;
     const encodedQuery = encodeURIComponent(query);
-    const fullUrl = `${URL}?q=${encodedQuery}&count=10`;
-    
+    let fullUrl = `${URL}?q=${encodedQuery}&count=10`;
+    if(nextPage && nextPageUrl){
+        fullUrl = nextPageUrl;
+    }
       fetch(fullUrl).then((response)=>{
         return response.json();
         }).then((data)=>{
             console.log(data);
-            buildTweets(data.statuses);
+            buildTweets(data.statuses, nextPage);
+            saveNextPage(data.search_metadata);
+            nextPageButtonVisibility(data.search_metadata);
         });
-
-        console.log(query);
-            
 
     }
 
@@ -36,6 +45,11 @@ const getTwitterData = () => {
  * Save the next page data
  */
 const saveNextPage = (metadata) => {
+    if(metadata.next_results) {
+        nextPageUrl = `${URL}${metadata.next_results}`;
+    } else {
+        nextPageUrl = null;
+    }
 }
 
 /**
@@ -56,11 +70,17 @@ const selectTrend = (e) => {
  * Set the visibility of next page based on if there is data on next page
  */
 const nextPageButtonVisibility = (metadata) => {
+    if(metadata.next_results){
+        document.getElementById('next-page').style.visibility = "visible";
+    } else {
+        document.getElementById('next-page').style.visibility = "hidden";
+    }
 }
 
 /**
  * Build Tweets HTML based on Data from API
  */
+
 
 
 const buildTweets = (tweets, nextPage) => {
@@ -78,7 +98,7 @@ const buildTweets = (tweets, nextPage) => {
                      ${tweet.user.name}
                 </div>
                  <div class="tweet-user-username">
-                     ${tweet.user.screen_name}
+                    @${tweet.user.screen_name}
                  </div>
              </div>
         </div>
@@ -103,11 +123,24 @@ const buildTweets = (tweets, nextPage) => {
 
     })
 
+    if (nextPage) {
+        document.querySelector('.tweets-list').insertAdjacentHTML('beforeend', twitterContent);
+    } else {
     document.querySelector('.tweets-list').innerHTML = twitterContent;
    
-
+    }    
 }
 
+// const addProfileImage = (tweets) => {
+
+// let profileImage = `<div class="profile">
+//     ${tweets.user.profile_image_url_https}
+// </div>`;
+
+
+// document.querySelector('.profile').innerHTML = profileImage;
+
+// }
 /**
  * Build HTML for Tweets Images
  */
@@ -133,15 +166,17 @@ const buildVideo = (mediaList) => {
     let videoExists = false;
     mediaList.map((media)=>{
         if(media.type == "video") {
-         videoExists = true;
+            videoExists = true;
+            const videoVariant = media.video_info.variants.find((variant)=>variant.content_type == 'video/mp4');
             videoContent += `
             <video controls>
-              <source src="${media.video_info.variants[0].url}" type="video/mp4">
+              <source src="${videoVariant.url}" type="video/mp4">
             </video>
             `
         } else if(media.type == "animated_gif"){
 
             videoExists = true;
+            const videoVariant = media.video_info.variants.find((variant)=>variant.content_type == 'video/mp4');
             videoContent += `
             <video loop autoplay>
               <source src="${media.video_info.variants[0].url}" type="video/mp4">
